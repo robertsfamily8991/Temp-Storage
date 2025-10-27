@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Call Log (v.37 stable)</title>
+<link rel="stylesheet" href="style.css" />
+<meta name="author" content="John Roberts - Information Architect : www.FullStackJohn.com">
+</head>
+<body>
+<div class="page-bg">
+  <main class="terminal-card">
+
+    <!-- Header -->
+    <header class="header">
+      <div>
+        <h1>CALL LOG</h1>
+        <p class="sub">by John Roberts — Information Architect</p>
+      </div>
+    </header>
+
+    <!-- Calendar -->
+    <section class="calendar-section">
+      <div class="calendar-header">
+        <button id="prevMonth" class="btn subtle">◀</button>
+        <div id="calendarMonthYear"></div>
+        <button id="nextMonth" class="btn subtle">▶</button>
+      </div>
+      <div id="calendarWeekdays" class="calendar-weekdays">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </section>
+
+    <!-- History Log -->
+    <h2>History Log</h2>
+
+    <!-- Search & Buttons -->
+    <div class="header-actions">
+      <input id="searchInput" type="search" placeholder="Search name, phone, email, vehicle, notes…" />
+      <div class="top-buttons">
+        <button id="addCallBtn" class="btn accent">Add Call</button>
+        <button id="toggleLogBtn" class="btn subtle">Hide Call Log</button>
+        <button id="monthToggleBtn" class="btn subtle">Show All Calls for Month</button>
+        <button id="followupsToggleBtn" class="btn subtle">Show Follow-ups</button>
+        <button id="exportBtn" class="btn accent">Export CSV</button>
+        <button id="importBtn" class="btn accent">Import CSV</button>
+        <input type="file" id="importFile" class="hidden" accept=".csv"/>
+        <button id="backupBtn" class="btn accent">Backup</button>
+        <button id="restoreBtn" class="btn accent">Restore</button>
+      </div>
+      <div class="columns-menu">
+        <button id="columnsToggle" class="btn subtle">⚙ Columns ▾</button>
+        <div id="columnsDropdown" class="columns-dropdown hidden">
+          <label><input type="checkbox" data-col="0" unchecked /> Timestamp</label>
+          <label><input type="checkbox" data-col="1" checked /> Name</label>
+          <label><input type="checkbox" data-col="2" checked /> Phone</label>
+          <label><input type="checkbox" data-col="3" checked /> Email</label>
+          <label><input type="checkbox" data-col="4" checked /> Vehicle</label>
+          <label><input type="checkbox" data-col="5" unchecked /> Type</label>
+          <label><input type="checkbox" data-col="6" checked /> Notes</label>
+          <label><input type="checkbox" data-col="7" checked /> Actions</label>
+          <div class="dropdown-actions">
+            <button id="columnsReset" class="btn subtle small">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Table -->
+    <section class="card-section log-section">
+      <div id="callLogWrapper" class="table-wrapper">
+        <table id="callTable" class="call-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th><th>Name</th><th>Phone</th><th>Email</th><th>Vehicle</th><th>Type</th><th>Notes</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h2 id="modalTitle">Add/Edit Call</h2>
+    <form id="modalForm" class="form-grid" autocomplete="off">
+      <label>Name</label><input id="m_name" type="text" />
+      <label>Phone</label><input id="m_number" type="tel" />
+      <label>Email</label><input id="m_email" type="email" />
+      <label>Vehicle</label><input id="m_vehicle" type="text" />
+      <label>Type</label>
+      <select id="m_callType">
+        <option>Incoming</option>
+        <option>Outgoing</option>
+        <option>Missed</option>
+      </select>
+      <label>Notes</label><textarea id="m_notes" rows="6"></textarea>
+      <label>Date</label><input id="m_date" type="date" />
+      <label><input id="m_followup" type="checkbox" /> Follow-up</label>
+
+      <!-- Created / Last Updated display -->
+      <div id="createdAt" class="small-text"></div>
+      <div id="lastUpdate" class="small-text"></div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn accent">Save</button>
+        <button type="button" id="modalDeleteBtn" class="btn danger">Delete</button>
+        <button type="button" id="modalCancelBtn" class="btn subtle">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
