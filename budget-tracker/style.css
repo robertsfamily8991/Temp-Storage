@@ -1,0 +1,244 @@
+/* --- Global --- */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f6fa;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 960px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* --- Summary --- */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.summary-card {
+  flex: 1;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  min-width: 150px;
+}
+
+.summary-card span {
+  display: block;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.summary-card strong {
+  font-size: 1.5rem;
+}
+
+.summary-card .dollar-sign,
+.summary-card #totalIncome,
+.summary-card #totalExpenses,
+.summary-card #remaining {
+  display: inline;
+}
+
+.summary-card.income { background: #d1fae5; }
+.summary-card.expense { background: #fee2e2; }
+.summary-card.remaining { background: #e0f2fe; }
+
+/* --- Controls --- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover { background: #2563eb; }
+
+.btn-secondary {
+  background: #d1d5db;
+  color: #111;
+}
+
+.btn-secondary:hover { background: #9ca3af; }
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover { background: #dc2626; }
+
+/* --- Calendar --- */
+#calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 30px;
+}
+
+.weekday-header {
+  text-align: center;
+  font-weight: bold;
+  padding: 4px 0;
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+
+.day {
+  background: #f3f4f6;
+  border-radius: 6px;
+  padding: 4px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  min-height: 80px;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.day:hover {
+  background: #e0f2fe;
+}
+
+.day.today {
+  border: 2px solid #3b82f6;
+}
+
+.day-number {
+  font-weight: bold;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.entry {
+  font-size: 0.65rem;
+  margin: 2px 0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  word-break: break-word;
+}
+
+.entry.income { background-color: #10b981; color: white; }
+.entry.expense { background-color: #ef4444; color: white; }
+.entry.investment { background-color: #facc15; color: #1f2937; }
+
+/* --- Log Table --- */
+.log-section {
+  margin-bottom: 20px;
+}
+
+.log-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.log-table th, .log-table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: center;
+}
+
+.log-table th {
+  background-color: #f3f4f6;
+}
+
+.log-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.sort-select {
+  padding: 4px 6px;
+}
+
+/* --- Modal --- */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.4);
+  z-index: 50;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal-content h2 { margin-top: 0; }
+
+.modal-content label { display: block; margin-bottom: 8px; }
+
+.modal-content input, .modal-content select {
+  width: 100%;
+  padding: 6px;
+  margin-top: 2px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* --- Hidden --- */
+.hidden { display: none; }
+
+/* --- Responsive --- */
+@media(max-width: 600px){
+  .summary { flex-direction: column; }
+  .controls { flex-direction: column; align-items: flex-start; }
+  .month-nav h2 { margin: 0; }
+}

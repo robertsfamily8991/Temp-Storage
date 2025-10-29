@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker (v.33 stable)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <h1>Budget Tracker</h1>
+
+  <!-- Summary Section -->
+  <div class="summary">
+    <div class="summary-card income">
+      <span>Income <br><span id="incomeMonth"></span></span>
+      <strong><span class="dollar-sign">$</span><span id="totalIncome">0.00</span></strong>
+    </div>
+    <div class="summary-card expense">
+      <span>Expenses <br><span id="expenseMonth"></span></span>
+      <strong><span class="dollar-sign">$</span><span id="totalExpenses">0.00</span></strong>
+    </div>
+    <div class="summary-card remaining">
+      <span>Remaining <br><span id="remainingMonth"></span></span>
+      <strong><span class="dollar-sign">$</span><span id="remaining">0.00</span></strong>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button id="openAddEntry" class="btn-primary">+ Add Entry</button>
+    <div class="month-nav">
+      <button id="prevMonth" class="btn-secondary">← Prev</button>
+      <h2 id="monthTitle"></h2>
+      <button id="nextMonth" class="btn-secondary">Next →</button>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div id="calendar">
+    <div class="weekday-header">Sun</div>
+    <div class="weekday-header">Mon</div>
+    <div class="weekday-header">Tue</div>
+    <div class="weekday-header">Wed</div>
+    <div class="weekday-header">Thu</div>
+    <div class="weekday-header">Fri</div>
+    <div class="weekday-header">Sat</div>
+  </div>
+
+  <!-- Log Section -->
+  <div class="log-section">
+    <h2>Log (<span id="logMonth"></span>)</h2>
+    <div class="log-controls">
+      <select id="sortLog" class="sort-select">
+        <option value="date">Sort by Date</option>
+        <option value="amount">Sort by Amount</option>
+        <option value="type">Sort by Type</option>
+        <option value="title">Sort by Title</option>
+        <option value="rule">Sort by Rule</option>
+      </select>
+      <label><input type="checkbox" id="includeTotals"> Include Monthly Totals</label>
+      <button id="exportLog" class="btn-primary">Export Log</button>
+    </div>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Title</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Rule</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="log-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Entry Modal -->
+<div id="entryModal" class="modal hidden">
+  <div class="modal-content">
+    <h2 id="modalHeader">Entry</h2>
+    <form id="modalForm">
+      <label>Type
+        <select id="modalType">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+          <option value="investment">Investment</option>
+        </select>
+      </label>
+
+      <label>Title
+        <input type="text" id="modalTitleInput" required>
+      </label>
+
+      <label>Amount
+        <input type="number" id="modalAmount" step="0.01" required>
+      </label>
+
+      <label>Recurrence
+        <select id="modalRecurrence">
+          <option value="once">One-time</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="annual">Annually</option>
+        </select>
+      </label>
+
+      <div id="modalWeeklyFields" class="hidden">
+        <label>Day of Week
+          <select id="modalDayOfWeek">
+            <option value="0">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="modalMonthlyFields" class="hidden">
+        <label>Day of Month
+          <input type="number" id="modalDayOfMonth" min="1" max="31">
+        </label>
+      </div>
+
+      <label>Start Date (required for one-time)
+        <input type="date" id="modalStartDate" required>
+      </label>
+
+      <label>End Date (optional)
+        <input type="date" id="modalEndDate">
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" id="modalDelete" class="btn-danger">Delete</button>
+        <button type="button" id="modalCancel" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
