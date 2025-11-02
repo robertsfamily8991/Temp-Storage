@@ -22,6 +22,7 @@ const modalMonthlyFields = document.getElementById("modalMonthlyFields");
 const logBody = document.getElementById("log-body");
 const sortLog = document.getElementById("sortLog");
 const exportBtn = document.getElementById("exportLog");
+const includeTotalsCheckbox = document.getElementById("includeTotals");
 
 const totalIncome = document.getElementById("totalIncome");
 const totalExpensesEl = document.getElementById("totalExpenses");
@@ -33,12 +34,10 @@ let currentMonth = new Date();
 let editingIndex = null;
 let modalDate = null;
 
-// --- SAVE ---
 function saveEntries() {
   localStorage.setItem("budgetEntries", JSON.stringify(entries));
 }
 
-// --- DATE HELPERS ---
 function buildISODateLocal(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
@@ -76,7 +75,7 @@ function occursOnDate(entry, day) {
   }
 }
 
-// --- CALENDAR ---
+// CALENDAR RENDER
 function renderCalendar() {
   const y = currentMonth.getFullYear();
   const m = currentMonth.getMonth();
@@ -106,7 +105,9 @@ function renderCalendar() {
     dayDiv.className = "day";
     dayDiv.dataset.date = buildISODateLocal(y, m, day);
 
-    if (current.toDateString() === new Date().toDateString()) dayDiv.classList.add("today");
+    if (current.toDateString() === new Date().toDateString()) {
+      dayDiv.classList.add("today");
+    }
 
     const dayNumber = document.createElement("div");
     dayNumber.className = "day-number";
@@ -130,7 +131,7 @@ function renderCalendar() {
   }
 }
 
-// --- MODAL HANDLERS ---
+// MODAL HANDLERS
 function openModalForDate(date) {
   entryModal.classList.remove("hidden");
   modalForm.reset();
@@ -181,7 +182,8 @@ modalForm.addEventListener("submit", (e) => {
     endDate: modalEndDate.value,
   };
   if (target.recurrence === "once") target.date = modalStartDate.value;
-  if (target.recurrence === "annual") target.monthDay = `${new Date().getMonth() + 1}-${new Date().getDate()}`;
+  if (target.recurrence === "annual")
+    target.monthDay = `${new Date().getMonth() + 1}-${new Date().getDate()}`;
 
   if (editingIndex !== null) entries[editingIndex] = target;
   else entries.push(target);
@@ -212,7 +214,6 @@ function modalDeleteHandler(i) {
   updateSummary();
 }
 
-// --- MONTH NAVIGATION ---
 prevMonth.addEventListener("click", () => {
   currentMonth.setMonth(currentMonth.getMonth() - 1);
   renderCalendar();
@@ -226,7 +227,7 @@ nextMonth.addEventListener("click", () => {
   updateSummary();
 });
 
-// --- LOG ---
+// LOG
 function renderLog() {
   const visibleEntries = [];
   const y = currentMonth.getFullYear();
@@ -246,17 +247,28 @@ function renderLog() {
 
   let sorted = [...visibleEntries];
   switch (sortLog.value) {
-    case "date": sorted.sort((a, b) => (a.date || "").localeCompare(b.date || "")); break;
-    case "amount": sorted.sort((a, b) => a.amount - b.amount); break;
-    case "type": sorted.sort((a, b) => a.type.localeCompare(b.type)); break;
-    case "title": sorted.sort((a, b) => a.title.localeCompare(b.title)); break;
-    case "rule": sorted.sort((a, b) => a.recurrence.localeCompare(b.recurrence)); break;
+    case "date":
+      sorted.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+      break;
+    case "amount":
+      sorted.sort((a, b) => a.amount - b.amount);
+      break;
+    case "type":
+      sorted.sort((a, b) => a.type.localeCompare(b.type));
+      break;
+    case "title":
+      sorted.sort((a, b) => a.title.localeCompare(b.title));
+      break;
+    case "rule":
+      sorted.sort((a, b) => a.recurrence.localeCompare(b.recurrence));
+      break;
   }
 
   logBody.innerHTML = "";
   sorted.forEach((e, i) => {
     let dateDisp = formatDateMMDDYYYY(e.date);
     let ruleDisp = { once: "One-time", weekly: "Weekly", monthly: "Monthly", annual: "Annually" }[e.recurrence];
+
     logBody.innerHTML += `
       <tr class="${e.type}">
         <td>${e.type}</td>
@@ -274,7 +286,7 @@ function renderLog() {
 
 sortLog.addEventListener("change", renderLog);
 
-// --- SUMMARY ---
+// SUMMARY
 function updateSummary() {
   const y = currentMonth.getFullYear();
   const m = currentMonth.getMonth();
@@ -297,7 +309,9 @@ function updateSummary() {
   remainingEl.textContent = remaining.toFixed(2);
 
   const remainingCard = document.querySelector(".summary-card.remaining");
-  remainingCard.style.color = remaining > 0 ? "#10b981" : remaining < 0 ? "#ef4444" : "#6b7280";
+  if (remaining > 0) remainingCard.style.color = "#10b981";
+  else if (remaining < 0) remainingCard.style.color = "#ef4444";
+  else remainingCard.style.color = "#6b7280";
 
   const monthName = currentMonth.toLocaleString("default", { month: "long" });
   document.getElementById("incomeMonth").textContent = monthName;
@@ -305,8 +319,9 @@ function updateSummary() {
   document.getElementById("remainingMonth").textContent = monthName;
 }
 
-// --- EXPORT CSV ---
+// EXPORT CSV
 exportBtn.addEventListener("click", () => {
+  const includeTotals = includeTotalsCheckbox.checked;
   let csvContent = "Type,Title,Amount,Date,Rule\n";
   const y = currentMonth.getFullYear();
   const m = currentMonth.getMonth();
@@ -330,6 +345,15 @@ exportBtn.addEventListener("click", () => {
     csvContent += `${e.type},${e.title},${e.amount},${dateDisp},${ruleDisp}\n`;
   });
 
+  if (includeTotals) {
+    const income = Number(totalIncome.textContent);
+    const expenses = Number(totalExpensesEl.textContent);
+    const remaining = Number(remainingEl.textContent);
+    csvContent += `Totals,,${income},,Income\n`;
+    csvContent += `Totals,,${expenses},,Expenses\n`;
+    csvContent += `Totals,,${remaining},,Remaining\n`;
+  }
+
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
@@ -337,46 +361,49 @@ exportBtn.addEventListener("click", () => {
   link.click();
 });
 
-// --- BACKUP & RESTORE BUTTONS ---
-const exportJsonBtn = document.createElement("button");
-exportJsonBtn.textContent = "Backup JSON";
-exportJsonBtn.className = "btn-secondary";
-exportBtn.insertAdjacentElement("afterend", exportJsonBtn);
-
-exportJsonBtn.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `budget_backup_${currentMonth.getFullYear()}_${currentMonth.getMonth() + 1}.json`;
-  link.click();
-});
+// --- JSON BACKUP AND RESTORE ---
+const backupBtn = document.createElement("button");
+backupBtn.className = "btn-primary";
+backupBtn.textContent = "Backup JSON";
+exportBtn.parentNode.insertBefore(backupBtn, exportBtn.nextSibling);
 
 const restoreBtn = document.createElement("button");
-restoreBtn.textContent = "Restore JSON";
 restoreBtn.className = "btn-secondary";
-exportJsonBtn.insertAdjacentElement("afterend", restoreBtn);
+restoreBtn.textContent = "Restore JSON";
+exportBtn.parentNode.insertBefore(restoreBtn, backupBtn.nextSibling);
+
+backupBtn.addEventListener("click", () => {
+  try {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `budget_backup_${currentMonth.getMonth() + 1}_${currentMonth.getFullYear()}.json`;
+    link.click();
+  } catch (err) {
+    alert("Error creating backup: " + err.message);
+  }
+});
 
 restoreBtn.addEventListener("click", () => {
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".json";
-  input.onchange = (e) => {
-    const file = e.target.files[0];
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = (evt) => {
       try {
         let data = JSON.parse(evt.target.result);
 
-        if (Array.isArray(data)) entries = data;
-        else if (data.entries && Array.isArray(data.entries)) entries = data.entries;
-        else if (typeof data === "object") {
-          const reconstructed = [];
-          Object.keys(data).forEach((key) => {
-            if (Array.isArray(data[key])) data[key].forEach((item) => reconstructed.push(item));
-          });
-          entries = reconstructed;
-        } else throw new Error("Invalid JSON structure");
+        // Flexible handling: accept top-level array or object with entries array
+        if (!Array.isArray(data)) {
+          if (data.entries && Array.isArray(data.entries)) data = data.entries;
+          else if (typeof data === "object") data = Object.values(data).flatMap(v => Array.isArray(v) ? v : []);
+        }
+        if (!Array.isArray(data)) throw new Error("Invalid JSON structure");
 
+        entries = data;
         saveEntries();
         renderCalendar();
         renderLog();
@@ -392,11 +419,10 @@ restoreBtn.addEventListener("click", () => {
   input.click();
 });
 
-// --- INIT ---
+// INIT
 renderCalendar();
 renderLog();
 updateSummary();
-
 openAddEntryBtn.addEventListener("click", () =>
   openModalForDate(buildISODateLocal(currentMonth.getFullYear(), currentMonth.getMonth(), new Date().getDate()))
 );
