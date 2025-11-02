@@ -29,31 +29,37 @@ const totalExpensesEl = document.getElementById("totalExpenses");
 const remainingEl = document.getElementById("remaining");
 const logMonth = document.getElementById("logMonth");
 
+// Entries
 let entries = JSON.parse(localStorage.getItem("budgetEntries")) || [];
 let currentMonth = new Date();
 let editingIndex = null;
 let modalDate = null;
 
+// Save to localStorage
 function saveEntries() {
   localStorage.setItem("budgetEntries", JSON.stringify(entries));
 }
 
+// Utility: build ISO date
 function buildISODateLocal(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
+// Utility: parse ISO to Date
 function localDateFromISO(iso) {
   if (!iso) return null;
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 
+// Format date MM-DD-YYYY
 function formatDateMMDDYYYY(dateStr) {
   if (!dateStr) return "";
   const [y, m, d] = dateStr.split("-");
   return `${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}-${y}`;
 }
 
+// Check if entry occurs on day
 function occursOnDate(entry, day) {
   const start = entry.startDate ? localDateFromISO(entry.startDate) : null;
   const end = entry.endDate ? localDateFromISO(entry.endDate) : null;
@@ -75,7 +81,7 @@ function occursOnDate(entry, day) {
   }
 }
 
-// CALENDAR RENDER
+// CALENDAR
 function renderCalendar() {
   const y = currentMonth.getFullYear();
   const m = currentMonth.getMonth();
@@ -86,7 +92,7 @@ function renderCalendar() {
   const lastDay = new Date(y, m + 1, 0);
   calendar.innerHTML = "";
 
-  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach((dayName) => {
+  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(dayName => {
     const header = document.createElement("div");
     header.className = "weekday-header";
     header.textContent = dayName;
@@ -115,12 +121,12 @@ function renderCalendar() {
     dayNumber.onclick = () => openModalForDate(buildISODateLocal(y, m, day));
     dayDiv.appendChild(dayNumber);
 
-    const dailyEntries = entries.filter((e) => occursOnDate(e, current));
-    dailyEntries.forEach((e) => {
+    const dailyEntries = entries.filter(e => occursOnDate(e, current));
+    dailyEntries.forEach(e => {
       const div = document.createElement("div");
       div.className = `entry ${e.type}`;
       div.textContent = `${e.title} $${e.amount.toFixed(2)}`;
-      div.onclick = (ev) => {
+      div.onclick = ev => {
         openModalForEntry(entries.indexOf(e), ev);
         ev.stopPropagation();
       };
@@ -169,7 +175,7 @@ modalRecurrence.addEventListener("change", () => {
 
 modalCancel.addEventListener("click", () => entryModal.classList.add("hidden"));
 
-modalForm.addEventListener("submit", (e) => {
+modalForm.addEventListener("submit", e => {
   e.preventDefault();
   const target = {
     type: modalType.value,
@@ -182,8 +188,7 @@ modalForm.addEventListener("submit", (e) => {
     endDate: modalEndDate.value,
   };
   if (target.recurrence === "once") target.date = modalStartDate.value;
-  if (target.recurrence === "annual")
-    target.monthDay = `${new Date().getMonth() + 1}-${new Date().getDate()}`;
+  if (target.recurrence === "annual") target.monthDay = `${new Date().getMonth() + 1}-${new Date().getDate()}`;
 
   if (editingIndex !== null) entries[editingIndex] = target;
   else entries.push(target);
@@ -214,6 +219,7 @@ function modalDeleteHandler(i) {
   updateSummary();
 }
 
+// NAVIGATION
 prevMonth.addEventListener("click", () => {
   currentMonth.setMonth(currentMonth.getMonth() - 1);
   renderCalendar();
@@ -236,7 +242,7 @@ function renderLog() {
 
   for (let d = 1; d <= lastDay; d++) {
     const day = new Date(y, m, d);
-    entries.forEach((e) => {
+    entries.forEach(e => {
       if (occursOnDate(e, day)) {
         const copy = { ...e };
         copy.date = buildISODateLocal(day.getFullYear(), day.getMonth(), day.getDate());
@@ -265,10 +271,9 @@ function renderLog() {
   }
 
   logBody.innerHTML = "";
-  sorted.forEach((e, i) => {
-    let dateDisp = formatDateMMDDYYYY(e.date);
-    let ruleDisp = { once: "One-time", weekly: "Weekly", monthly: "Monthly", annual: "Annually" }[e.recurrence];
-
+  sorted.forEach(e => {
+    const dateDisp = formatDateMMDDYYYY(e.date);
+    const ruleDisp = { once: "One-time", weekly: "Weekly", monthly: "Monthly", annual: "Annually" }[e.recurrence];
     logBody.innerHTML += `
       <tr class="${e.type}">
         <td>${e.type}</td>
@@ -295,7 +300,7 @@ function updateSummary() {
 
   for (let d = 1; d <= lastDay; d++) {
     const day = new Date(y, m, d);
-    entries.forEach((e) => {
+    entries.forEach(e => {
       if (occursOnDate(e, day)) {
         if (e.type === "income") income += Number(e.amount) || 0;
         else expenses += Number(e.amount) || 0;
@@ -330,7 +335,7 @@ exportBtn.addEventListener("click", () => {
   const visibleEntries = [];
   for (let d = 1; d <= lastDay; d++) {
     const day = new Date(y, m, d);
-    entries.forEach((e) => {
+    entries.forEach(e => {
       if (occursOnDate(e, day)) {
         const copy = { ...e };
         copy.date = buildISODateLocal(day.getFullYear(), day.getMonth(), day.getDate());
@@ -339,7 +344,7 @@ exportBtn.addEventListener("click", () => {
     });
   }
 
-  visibleEntries.forEach((e) => {
+  visibleEntries.forEach(e => {
     let dateDisp = formatDateMMDDYYYY(e.date);
     let ruleDisp = { once: "One-time", weekly: "Weekly", monthly: "Monthly", annual: "Annually" }[e.recurrence];
     csvContent += `${e.type},${e.title},${e.amount},${dateDisp},${ruleDisp}\n`;
@@ -361,63 +366,56 @@ exportBtn.addEventListener("click", () => {
   link.click();
 });
 
-// --- JSON BACKUP AND RESTORE ---
+// BACKUP & RESTORE BUTTONS
 const backupBtn = document.createElement("button");
-backupBtn.className = "btn-primary";
 backupBtn.textContent = "Backup JSON";
-exportBtn.parentNode.insertBefore(backupBtn, exportBtn.nextSibling);
+backupBtn.className = "btn-secondary";
+backupBtn.onclick = () => {
+  const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `budget_backup.json`;
+  link.click();
+};
 
 const restoreBtn = document.createElement("button");
-restoreBtn.className = "btn-secondary";
 restoreBtn.textContent = "Restore JSON";
-exportBtn.parentNode.insertBefore(restoreBtn, backupBtn.nextSibling);
-
-backupBtn.addEventListener("click", () => {
-  try {
-    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `budget_backup_${currentMonth.getMonth() + 1}_${currentMonth.getFullYear()}.json`;
-    link.click();
-  } catch (err) {
-    alert("Error creating backup: " + err.message);
-  }
-});
-
-restoreBtn.addEventListener("click", () => {
+restoreBtn.className = "btn-secondary";
+restoreBtn.onclick = () => {
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".json";
-  input.onchange = () => {
-    const file = input.files[0];
+  input.onchange = e => {
+    const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = evt => {
       try {
-        let data = JSON.parse(evt.target.result);
-
-        // Flexible handling: accept top-level array or object with entries array
-        if (!Array.isArray(data)) {
-          if (data.entries && Array.isArray(data.entries)) data = data.entries;
-          else if (typeof data === "object") data = Object.values(data).flatMap(v => Array.isArray(v) ? v : []);
-        }
-        if (!Array.isArray(data)) throw new Error("Invalid JSON structure");
-
-        entries = data;
+        const data = JSON.parse(evt.target.result);
+        if (!Array.isArray(data)) throw new Error("Invalid JSON structure.");
+        entries = data.map(item => {
+          if (item.recurrence === "once" && !item.date && item.startDate) {
+            item.date = item.startDate;
+          }
+          return item;
+        });
         saveEntries();
         renderCalendar();
         renderLog();
         updateSummary();
         alert("Restore successful!");
       } catch (err) {
-        console.error(err);
-        alert("Error reading JSON file. Make sure it is a valid backup.");
+        alert("Error reading JSON file: " + err.message);
       }
     };
     reader.readAsText(file);
   };
   input.click();
-});
+};
+
+// Add buttons next to export
+exportBtn.parentNode.appendChild(backupBtn);
+exportBtn.parentNode.appendChild(restoreBtn);
 
 // INIT
 renderCalendar();
