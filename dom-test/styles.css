@@ -1,0 +1,4 @@
+/* Basic styling for DOM tests */
+body { font-family: sans-serif; padding: 20px; }
+ul { margin-top: 10px; }
+#container { margin-top: 10px; padding: 10px; border: 1px solid #ccc; }
